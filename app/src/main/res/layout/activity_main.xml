@@ -43,17 +43,33 @@
 
     </LinearLayout>
 
-    <Button
-        android:id="@+id/next_button"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:orientation="horizontal">
 
-        android:background="@android:color/transparent"
-        android:drawableEnd="@mipmap/ssstrelka"
-        android:drawablePadding="4dp">
-    </Button>
+        <Button
+            android:id="@+id/before_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:drawableEnd="@mipmap/ssstrelka"
+            android:drawablePadding="4dp"
+            android:rotationY="-180">
+        </Button>
+        <Button
+            android:id="@+id/next_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:drawableEnd="@mipmap/ssstrelka"
+            android:drawablePadding="4dp">
+        </Button>
+</LinearLayout>
 
 </LinearLayout>
+
+
 
 
 
