@@ -10,8 +10,10 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlin.math.log
 
+private const val TAG = "MainActivity"
 
 class MainActivity : AppCompatActivity() {
 
@@ -30,9 +32,11 @@ class MainActivity : AppCompatActivity() {
         Question(R.string.question_asia, true))
 
     private var currentIndex = 0
-
+    private var correctCheckAnswer = 0
+    private var uncorrectCheckAnswer = 0
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Log.d(TAG,"onCreate called")
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         setContentView(R.layout.activity_main)
 
@@ -46,12 +50,38 @@ class MainActivity : AppCompatActivity() {
         question_text.setText(questionTextResId)
 
         true_button.setOnClickListener{ view: View ->
-            checkAnswer(true)
-            nextAnswer()
+            if (questionBank[currentIndex].checkAnswer) {
+                checkHaveAnswersForQuestions()
+                checkAnswer(true)
+                checkCompleteAnswers(correctCheckAnswer, uncorrectCheckAnswer)
+                nextAnswer()
+            }
+            else{
+                MaterialAlertDialogBuilder(this)
+                    .setTitle("Вы уже ответили на этот вопрос!")
+                    .setMessage("")
+                    .setPositiveButton("ОК") { dialog, _ ->
+                        dialog.dismiss()
+                    }
+                    .show()
+            }
         }
         false_button.setOnClickListener{view: View ->
-            checkAnswer(false)
-            nextAnswer()
+            if (questionBank[currentIndex].checkAnswer) {
+                checkHaveAnswersForQuestions()
+                checkAnswer(false)
+                checkCompleteAnswers(correctCheckAnswer, uncorrectCheckAnswer)
+                nextAnswer()
+            }
+            else{
+                MaterialAlertDialogBuilder(this)
+                    .setTitle("Вы уже ответили на этот вопрос!")
+                    .setMessage("")
+                    .setPositiveButton("ОК") { dialog, _ ->
+                        dialog.dismiss()
+                    }
+                    .show()
+            }
         }
         next_button.setOnClickListener {
             nextAnswer()
@@ -63,13 +93,73 @@ class MainActivity : AppCompatActivity() {
 
         }
 
+    override fun onStart() {
+        super.onStart()
+        Log.d(TAG,"onStart called")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Log.d(TAG,"onResume called")
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Log.d(TAG,"onPause called")
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Log.d(TAG,"onStop called")
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.d(TAG,"onDestroy called")
+    }
+
+
+
+    private fun checkHaveAnswersForQuestions(){
+        var checkAnswersForQuestion = questionBank[currentIndex].checkAnswer
+
+        if (!checkAnswersForQuestion){
+            lockBnt()
+        }
+    }
+
+    private fun lockBnt(){
+
+            true_button.isEnabled = false  // Отключаем кнопку
+            false_button.isEnabled = false
+            // Опционально: меняем внешний вид
+            true_button.alpha = 0.5f      // Полупрозрачность
+            false_button.alpha = 0.5f
+
+    }
+    private fun checkCompleteAnswers(correctCheckAnswer: Int,uncorrectCheckAnswer : Int){
+        if (correctCheckAnswer + uncorrectCheckAnswer >= questionBank.size){
+            MaterialAlertDialogBuilder(this)
+                .setTitle("Вы ответили на все вопросы!")
+                .setMessage("Ваш результат $correctCheckAnswer верных из ${questionBank.size} возможных")
+                .setPositiveButton("ОК") { dialog, _ ->
+                    dialog.dismiss()
+                }
+                .show()
+        }
+
+    }
     private fun checkAnswer(userAnswer: Boolean){
         val correctAnswer = questionBank[currentIndex].answer
 
         val messageResId = if (userAnswer == correctAnswer){
+            correctCheckAnswer ++
+            questionBank[currentIndex].checkAnswer = false
             R.string.incorrect_toast
         }
         else{
+            uncorrectCheckAnswer ++
+            questionBank[currentIndex].checkAnswer = false
             R.string.uncorrect_toast
         }
 
